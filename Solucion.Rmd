@@ -1,0 +1,278 @@
+---
+title: "Práctica 1"
+author: "Carlos Foó Sidro"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+  html_document:
+    number_sections: true
+    theme: lumen
+    toc: true
+always_allow_html: true
+lang: "es-ES"
+---
+
+Ejemplo: fichero DFP1_11122015 124700.csv
+
+2.1 Importación del fichero
+
+1. Usar la herramienta de importación para previsualizar el resultado final. Compara las opciones base y readr.
+```{r}
+#base: 
+DFP1_11122015.124700 <- read.delim("C:/Users/cfoo3/OneDrive/Escritorio/Máster/AED/P1/data/DFP1_11122015 124700.csv")
+
+#readr: library(readr) 
+#DFP1_11122015_124700 <- read_delim("C:/Users/cfoo3/OneDrive/Escritorio/Máster/AED/P1/data/DFP1_11122015 124700.csv", 
+#    delim = "\t", escape_double = FALSE, 
+#    trim_ws = TRUE)
+
+#La opción base es menos visual pero más automática, la opción readr es menos automática ya que hay que especificar el delimitador (tab) pero es más visual.
+
+```
+
+2. Leer el fichero con read.csv y el parámetro stringsAsFactors=F
+```{r}
+datos <- read.csv("./data/DFP1_11122015 124700.csv", sep = "\t", stringsAsFactors = F)
+```
+
+
+3. Convertir fecha y hora con as.POSIXlt y as.hms (hms library).
+```{r}
+library(hms)
+
+datos$FECHA <- as.POSIXlt(datos$FECHA, format = "%d/%m/%Y")
+datos$HORA <- as_hms(datos$HORA)
+```
+
+
+4. Almacenar con save en una carpeta con nombre results dentro de la carpeta data.
+```{r}
+if (!dir.exists("./data/results")) {
+  dir.create("./data/results")
+}
+
+save(datos, file = "./data/results/DFP1_11122015 124700.RData")
+```
+
+2.2 Inspección de los datos
+
+Inspecciona los datos con str, head, tail y summary. Describid que informacion os proporciona cada uno de ellos.
+```{r}
+#Usamos los datos sin convertir fecha y hora porque si no summary da error
+datos2 <- read.csv("./data/DFP1_11122015 124700.csv", sep = "\t", stringsAsFactors = F)
+# Ver la estructura interna, saber el tipo de cada columna, cauntas columnas y filas hay
+str(datos2)
+
+# Ver las primeras filas
+head(datos2)
+
+# Ver las últimas filas
+tail(datos2)
+
+# Ver un resumen estadístico de cada columna la longitud, número de únicos, mínimos, máximos, mediana, cuartiles, etc...
+summary(datos2)
+```
+
+3 Fichero Transactions from a Bakery (Kaggle)
+
+3.1 Importación del fichero
+
+Una vez hemos descargado el fichero Bakery Sales Dataset podríamos leerlo con read.csv y transformar los datos a los tipos correctos.
+
+Otra opción es usar la librería readr para especificar directamente el tipo de datos.
+
+1. Utiliza Import Dataset de RStudio, opción readr, para previsualizar el fichero y especificar los tipos de datos.
+```{r}
+library(readr)
+bakery_sales_revised <- read_csv("C:/Users/cfoo3/OneDrive/Escritorio/Máster/AED/P1/data/bakery_sales_revised.csv", col_types = cols(date_time = col_datetime(format = "%m/%d/%Y %H:%M")))
+```
+
+2. Copia el código resultante y comprueba la lectura de datos.
+```{r}
+#La lectura es correcta ya que he escpecificado date como tipo datetime
+```
+
+3. Guarda el data frame con save en la carpeta results.
+```{r}
+save(bakery_sales_revised, file = "./data/results/bakery_sales_revised_procesados.RData")
+```
+
+3.2 Inspección de los datos
+
+Inspecciona los datos con str, head, tail y summary.
+```{r}
+#Usamos los datos sin convertir fecha y hora porque si no summary da error
+datos2 <- read.csv("./data/bakery_sales_revised.csv", stringsAsFactors = F)
+# Ver la estructura interna, saber el tipo de cada columna, cauntas columnas y filas hay
+str(datos2)
+
+# Ver las primeras filas
+head(datos2)
+
+# Ver las últimas filas
+tail(datos2)
+
+# Ver un resumen estadístico de cada columna la longitud, número de únicos, mínimos, máximos, mediana, cuartiles, etc...
+summary(datos2)
+```
+
+4 Fichero SPSS PsychBike.sav
+
+4.1 Importación del fichero
+
+Podemos leer ficheros de IBM SPSS mediante la librería haven.
+
+1. Leer el fichero con read_sav.
+```{r}
+library(haven)
+
+PsychBike <- read_sav("./data/PsychBike.sav")
+```
+
+2. Guardar el data frame con save en la carpeta results.
+```{r}
+save(PsychBike, file = "./data/results/PsychBike.RData")
+```
+
+4.2 Inspección de los datos
+Inspecciona los datos con str, head, tail y summary.
+```{r}
+# Ver la estructura interna, saber el tipo de cada columna, cauntas columnas y filas hay
+str(PsychBike)
+
+# Ver las primeras filas
+head(PsychBike)
+
+# Ver las últimas filas
+tail(PsychBike)
+
+
+#Convertimos a character si no summary da error
+PsychBike$vehicle <- as.character(PsychBike$vehicle)
+PsychBike$Colour  <- as.character(PsychBike$Colour)
+PsychBike$helmet <- as.character(PsychBike$helmet)
+PsychBike$hour <- as.character(PsychBike$hour)
+PsychBike$Distance_from_kerb  <- as.character(PsychBike$Distance_from_kerb)
+PsychBike$Passing_distance <- as.character(PsychBike$Passing_distance)
+
+# Ver un resumen estadístico de cada columna la longitud, número de únicos, mínimos, máximos, mediana, cuartiles, etc...
+summary(PsychBike)
+```
+5 Fichero data iris.zip
+Visualiza la pagina web de los datos Iris del repostorio de UCI Machine Learning, copia el link de descarga y guarda el archivo zip en la carpeta data.
+```{r}
+url_iris <- "https://archive.ics.uci.edu/static/public/53/iris.zip"
+
+ruta_zip <- "./data/iris.zip"
+
+download.file(url = url_iris, destfile = ruta_zip, mode = "wb")
+```
+
+
+5.1 Descomprimir el fichero
+Utiliza la funcion unzip para descoprimirlo en la carpeta data.
+```{r}
+unzip(zipfile = ruta_zip, exdir = "./data")
+```
+
+6 Fichero data iris.data
+
+6.1 Importación del fichero
+
+1. Utiliza la funcion read.table para importar los datos.
+```{r}
+datos_iris <- read.table("./data/iris.data", sep = ",", header = FALSE, stringsAsFactors = FALSE)
+```
+
+2. Cambia el nombre de las columnas por las que corresponda a la base datos (mirar la información en la página web).
+```{r}
+colnames(datos_iris) <- c("sepal_length", "sepal_width", "petal_length", "petal_width", "class")
+```
+
+3. Guarda el data frame con save en la carpeta results.
+```{r}
+save(datos_iris, file = "./data/results/iris_data.RData")
+```
+
+6.2 Inspección de los datos
+Inspecciona los datos con str, head, tail y summary.
+```{r}
+# Ver la estructura interna, saber el tipo de cada columna, cauntas columnas y filas hay
+str(datos_iris)
+
+# Ver las primeras filas
+head(datos_iris)
+
+# Ver las últimas filas
+tail(datos_iris)
+
+# Ver un resumen estadístico de cada columna la longitud, número de únicos, mínimos, máximos, mediana, cuartiles, etc...
+summary(datos_iris)
+```
+7 Fichero JSON FileCodificado.json
+
+7.1 Importación del fichero
+
+Los ficheros JSON (JavaScript Object Notation) son ficheros de texto que contienen datos (originalmente presentaciones de objetos JavaScript). Es un formato muy popular que se utiliza frecuentemente como alternativa a los ficheros XML, puesto que son más fáciles de leer e interpretar.
+
+En R podemos importar ficheros JSON con la librería jsonlite. Las funciones más empleadas son:
+
+- read_json y write_json: leen/escriben objetos R directamente de/en ficheros JSON.
+- toJSON: obtiene una representación JSON de un objeto R.
+- fromJSON: inversa de la anterior, convierte una representación JSON en un objeto R.
+
+7.2 Importar el fichero FileCodificado.json
+
+1. Abrir el fichero FileCodificado.json con un editor de texto (el de RStudio vale) para ver qué contiene. Comprobaremos que se puede leer e interepretar con facilidad.
+```{r}
+#Típico fichero JSON con la siguiente estructura por cada elemento que entiendo que es un coche: Carburante, Potencia, Gama, etc...
+```
+
+2. Importar el fichero a R con read_json. Observar la importancia del parámetro simplifyVector.
+```{r}
+library(jsonlite)
+
+datos_json <- read_json("./data/FileCodificado.json", simplifyVector = TRUE)
+
+#El parámetro simplifyVector sirve para que lo almecene no como lista de listas (que cuesta mucho de almacenar y consultar), si no que lo almacene como un objeto de R más sencillo como un dataframe
+```
+
+
+3. Almacenar los resultados en FileCodificado.RData en la carpeta results.
+```{r}
+save(datos_json, file = "./data/results/FileCodificado.RData")
+```
+
+8 Fichero JSON iris_json.json
+
+8.1 Importar el fichero iris_json.json
+
+1. Abrir el fichero iris_json.json con un editor de texto (el de RStudio vale) para ver qué contiene. Comprobaremos que se puede leer e interepretar con facilidad.
+```{r}
+#Es el fichero irirs de antes pero almacenado como un JSON
+```
+
+2. Importar el fichero a R con read_json.
+```{r}
+library(jsonlite)
+datos_json_iris <- read_json("./data/iris_json.json", simplifyVector = TRUE)
+```
+
+
+3. Importa el fichero a R con fromJSON. ¿Que diferencia hay entre read_json y fromJSON?
+```{r}
+datos_from_json_iris <- fromJSON("./data/iris_json.json")
+#La diferencia es que fromJSON tiene por defecto la opción simplifyVector = TRUE
+```
+
+
+4. Almacenar los resultados en iris_json.RData en results.
+```{r}
+#solo gaurdo una proque son iguales
+save(datos_json_iris, file = "./data/results/iris_json.RData")
+```
+
+
